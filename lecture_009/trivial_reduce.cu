@@ -7,7 +7,7 @@ __global__ void TrivialSumReductionKernel(
         int input_size
     ) {
     float sum = 0.0f;
-    for (unsigned int pos = 0; pos < input_size; pos+=1) {
+    for (int pos = 0; pos < input_size; pos+=1) {
         sum += input[pos];  // sum iteratively
     }
     output[0] = sum;  // Write sum to output

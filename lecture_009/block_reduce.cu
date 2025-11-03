@@ -4,7 +4,7 @@
 
 # define MAX_THREADS 1024
 
-__global__ void TrivialSumReductionKernel(float* input, float* output) {
+__global__ void BlockSumReductionKernel(float* input, float* output) {
     // Super-fast but super small memory shared in blocks
     __shared__ float input_s[MAX_THREADS];  
     int thread_id = threadIdx.x;
@@ -37,7 +37,7 @@ __global__ void TrivialSumReductionKernel(float* input, float* output) {
 
 int main() {
     // Size of the input data
-    const int size = 2048*200000;
+    const int size = 2048*250000;
     const int bytes = size * sizeof(float);
 
     // Work only with size multiple of 2048
@@ -72,7 +72,7 @@ int main() {
     std::cout << "\nExpected result: " << size << std::endl;
 
 
-    TrivialSumReductionKernel<<<n_blocks, n_threads>>>(d_input, d_output);
+    BlockSumReductionKernel<<<n_blocks, n_threads>>>(d_input, d_output);
 
     // Copy result back to host
     cudaMemcpy(h_output, d_output, sizeof(float), cudaMemcpyDeviceToHost);

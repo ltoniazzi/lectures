@@ -15,7 +15,7 @@ __global__ void TrivialSumReductionKernel(
 
 int main() {
     // Size of the input data
-    const int size = 2048;
+    const int size = 2048 * 2000;
     const int bytes = size * sizeof(float);
 
     // Allocate memory for input and output on host
@@ -36,11 +36,16 @@ int main() {
     // Copy data from host to device
     cudaMemcpy(d_input, h_input, bytes, cudaMemcpyHostToDevice);
 
+
+
     // Launch the kernel
     int n_threads = 1;
     int n_blocks = 1;
     TrivialSumReductionKernel<<<n_blocks, n_threads>>>(d_input, d_output, size);
 
+    std::cout << "Array size: " << size << std::endl;
+    std::cout << "Blocks: " << n_blocks << ", Threads per block: " << n_threads << std::endl;
+    std::cout << "\nExpected result: " << size << std::endl;
     // Copy result back to host
     cudaMemcpy(h_output, d_output, sizeof(float), cudaMemcpyDeviceToHost);
 

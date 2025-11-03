@@ -5,7 +5,8 @@
 # define MAX_THREADS 1024
 
 __global__ void TrivialSumReductionKernel(float* input, float* output) {
-    __shared__ float input_s[MAX_THREADS];
+    // Super-fast but super small memory shared in blocks
+    __shared__ float input_s[MAX_THREADS];  
     int thread_id = threadIdx.x;
     int block_dim = blockDim.x;
     int block_id = blockIdx.x;
@@ -36,7 +37,7 @@ __global__ void TrivialSumReductionKernel(float* input, float* output) {
 
 int main() {
     // Size of the input data
-    const int size = 2048*20;
+    const int size = 2048*200000;
     const int bytes = size * sizeof(float);
 
     // Work only with size multiple of 2048

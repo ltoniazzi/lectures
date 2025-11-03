@@ -31,6 +31,10 @@ prof_trivial:
 	$(MAKE) run_trivial
 	$(MAKE) prof FILE_NAME=trivial_reduce | grep msec
 	
+prof_thread:
+	$(MAKE) run_thread
+	$(MAKE) prof FILE_NAME=thread_reduce
+
 prof_block_and_torch:
 	$(MAKE) run_block
 	@echo "Our implementation"

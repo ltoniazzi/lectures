@@ -1,20 +1,27 @@
 #include <iostream>
 #include <cuda.h>
 
-__global__ void TrivialSumReductionKernel(
+__global__ void ThreadSumReductionKernel(
         float* input, 
         float* output
     ) {
+    // I'm thread number thread_id
     int thread_id = threadIdx.x;
+    // Also there are dim=1024 other threads in my block
     int dim = blockDim.x;
 
+    // I should write to my id*2 to the input vector
     int thread_write_location = 2 * thread_id;
 
-    for (unsigned int stride = 1; stride <= dim; stride*=2) {
+    // Start log(N) steps
+    for (int stride = 1; stride <= dim; stride*=2) {
+        // Am i and active thread at this step?
         if (thread_id % stride == 0 ) {
-        input[thread_write_location] += input[thread_write_location + stride];  // sum iteratively
+            // Add mine with the value at the stride
+            input[thread_write_location] += input[thread_write_location + stride];  // sum iteratively
         }
-         __syncthreads();
+        // Hey other threads in the block, can we move to next step???
+        __syncthreads();
     }
     if (thread_id == 0){
     *output  = input[0];  // Write sum to output
@@ -45,9 +52,9 @@ int main() {
     cudaMemcpy(d_input, h_input, bytes, cudaMemcpyHostToDevice);
 
     // Launch the kernel
-    int n_threads = size/2;
-    int n_blocks = 1;
-    TrivialSumReductionKernel<<<n_blocks, n_threads>>>(d_input, d_output);
+    int n_threads = size/2;  // number of threads in each block
+    int n_blocks = 1;  // EAch block is a collection of threads
+    ThreadSumReductionKernel<<<n_blocks, n_threads>>>(d_input, d_output);
 
     // Copy result back to host
     cudaMemcpy(h_output, d_output, sizeof(float), cudaMemcpyDeviceToHost);
